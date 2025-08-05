@@ -2,9 +2,9 @@
 
 // phpcs:ignoreFile
 
-$settings['config_sync_directory'] = '../config/sync';
-
 // DDEV-created Drupal 10 settings.php from upstream default.settings.php
+
+$settings['config_sync_directory'] = '../config/sync';
 
 /**
  * @file
@@ -290,7 +290,7 @@ $databases = [];
  *   $settings['hash_salt'] = file_get_contents('/home/example/salt.txt');
  * @endcode
  */
-$settings['hash_salt'] = '';
+$settings['hash_salt'] = 'api90nV3owmF5lakyCinapDTSox8iB6zcBjLJus7-ieI1OoPzoeZNvyLr2yElywauohp_wBEmg';
 
 /**
  * Deployment identifier.
@@ -899,3 +899,29 @@ if (getenv('IS_DDEV_PROJECT') == 'true' && file_exists(__DIR__ . '/settings.ddev
 # if (file_exists($app_root . '/' . $site_path . '/settings.local.php')) {
 #   include $app_root . '/' . $site_path . '/settings.local.php';
 # }
+
+// $host_settings_file = dirname(__FILE__) . '/settings.pantheon.php';
+
+// // Require the settings file if it exists and is readable.
+// if (isset($host_settings_file) && file_exists($host_settings_file) && is_readable($host_settings_file)) {
+//   require $host_settings_file;
+// }
+/**
+ * Determine whether this is a preproduction or production environment, and
+ * then load the pantheon services.yml file.  This file should be named either
+ * 'pantheon-production-services.yml' (for 'live' or 'test' environments)
+ * 'pantheon-preproduction-services.yml' (for 'dev' or multidev environments).
+ */
+$pantheon_services_file = __DIR__ . '/services.pantheon.preproduction.yml';
+if (
+  isset($_ENV['PANTHEON_ENVIRONMENT']) &&
+  ( ($_ENV['PANTHEON_ENVIRONMENT'] == 'live') || ($_ENV['PANTHEON_ENVIRONMENT'] == 'test') )
+) {
+  $pantheon_services_file = __DIR__ . '/services.pantheon.production.yml';
+}
+
+if (file_exists($pantheon_services_file)) {
+  $settings['container_yamls'][] = $pantheon_services_file;
+}
+
+include \Pantheon\Integrations\Assets::dir() . "/settings.pantheon.php";
